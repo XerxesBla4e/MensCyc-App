@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Calendar</string>
+    <string name="add_button">Add Cycle</string>
+    <string name="error_fill_period_flow">Please Fill In Period Flow</string>
+    <string name="error_invalid_date_range">Start Date Cannot be After End Date</string>
+    <string name="period_entry_saved">Period Cycle Saved Successfully</string>
+</resources>
