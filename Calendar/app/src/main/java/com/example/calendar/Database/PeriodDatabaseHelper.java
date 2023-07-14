@@ -88,5 +88,9 @@ public class PeriodDatabaseHelper extends SQLiteOpenHelper {
 
         return periodEntries;
     }
-
+    public void deleteAllPeriodEntries() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_PERIODS, null, null);
+        db.close();
+    }
 }

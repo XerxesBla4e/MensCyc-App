@@ -3,6 +3,7 @@ package com.example.calendar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -43,7 +44,9 @@ public class SaveCycle extends AppCompatActivity {
                 } else {
                     // Save the information to the database
                     String startDate = formatDate(startCalendar);
+                    activitySaveCycleBinding.edtTxtInitDate.setText(startDate);
                     String endDate = formatDate(endCalendar);
+                    activitySaveCycleBinding.edtTxtFinishDate.setText(endDate);
                     String periodFlow = activitySaveCycleBinding.edtTxtPeriodFlow.getText().toString();
 
                     periodDatabaseHelper.addPeriodEntry(startDate, endDate, periodFlow);
@@ -54,6 +57,8 @@ public class SaveCycle extends AppCompatActivity {
                     activitySaveCycleBinding.edtTxtPeriodFlow.setText("");
 
                     Toast.makeText(SaveCycle.this, R.string.period_entry_saved, Toast.LENGTH_SHORT).show();
+
+                    sendBroadcast(new Intent("com.example.calendar.UPDATE_CALENDAR"));
                 }
             }
         });

@@ -5,13 +5,17 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.applandeo.materialcalendarview.CalendarDay;
@@ -38,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton floatingActionButton;
     PeriodDatabaseHelper periodDatabaseHelper;
     CalendarView calendarView;
+    Button clear;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -55,10 +60,17 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(getApplicationContext(), SaveCycle.class));
         });
 
-        customizeCalendarView();
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                periodDatabaseHelper.deleteAllPeriodEntries();
+            }
+        });
 
         // Retrieve period entries from the database
         List<PeriodEntry> periodEntries = periodDatabaseHelper.getPeriodEntries();
+        //Toast.makeText(getApplicationContext(),""+ periodEntries.size(),Toast.LENGTH_SHORT).show();
+
 
         // Calculate ovulation day
         LocalDate ovulationDay = calculateOvulationDay(periodEntries);
@@ -71,7 +83,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Calculate next period date
         LocalDate nextPeriodDate = calculateNextPeriodDate(periodEntries, averageCycleLength);
+
+        customizeCalendarView();
     }
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void customizeCalendarView() {
@@ -218,5 +233,28 @@ public class MainActivity extends AppCompatActivity {
     private void initViews(ActivityMainBinding activityMainBinding) {
         floatingActionButton = activityMainBinding.fab;
         calendarView = (CalendarView) activityMainBinding.calendarView;
+        clear = activityMainBinding.deleteButton;
     }
+
+    private BroadcastReceiver updateCalendarReceiver = new BroadcastReceiver() {
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Update the calendar view
+            customizeCalendarView();
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(updateCalendarReceiver, new IntentFilter("com.example.calendar.UPDATE_CALENDAR"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(updateCalendarReceiver);
+    }
+
 }
